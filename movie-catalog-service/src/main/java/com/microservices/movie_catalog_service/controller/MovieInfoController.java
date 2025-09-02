@@ -3,12 +3,10 @@ package com.microservices.movie_catalog_service.controller;
 import com.microservices.movie_catalog_service.model.MovieInfo;
 import com.microservices.movie_catalog_service.model.MovieInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class MovieInfoController {
@@ -25,4 +23,11 @@ public class MovieInfoController {
     public List<MovieInfo> getAll(){
         return repository.findAll();
     }
+
+    @GetMapping("/movie-info/find-path-by-id/{movieInfoId}")
+    public String findPathById(@PathVariable Long movieInfoId){
+        Optional<MovieInfo> movieInfo = repository.findById(movieInfoId);
+        return movieInfo.map(MovieInfo::getPath).orElse(null);
+    }
+
 }

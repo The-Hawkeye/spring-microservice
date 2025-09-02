@@ -3,6 +3,7 @@ package com.microservices.movie_streaming_service.controller;
 import org.apache.hc.core5.http.io.entity.InputStreamEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,13 @@ import java.io.FileNotFoundException;
 @RestController
 public class MovieStreamController {
 
+
+    @Autowired
+    private MovieCatalogService movieCatalogService;
+
     private static final Logger logger = LoggerFactory.getLogger(MovieStreamController.class);
     private static final String VIDEO_PATH = "/Users/anubhavmaurya/Desktop/";
+
 
     @GetMapping("/stream/{videoPath}")
     public ResponseEntity<InputStreamResource> streamVideo(@PathVariable String videoPath) throws FileNotFoundException {
@@ -33,5 +39,12 @@ public class MovieStreamController {
         }else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/stream/with-id/{movieId}")
+    public ResponseEntity<InputStreamResource> streamVideoById(@PathVariable Long movieId) throws FileNotFoundException {
+        String videoPath = movieCatalogService.getMoviePath(movieId);
+        logger.info(videoPath + "Resoloved Movie Path =========");
+        return streamVideo(videoPath);
     }
 }

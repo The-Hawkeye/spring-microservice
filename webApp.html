@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Video Catalog</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 30px;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card-title {
+      background-color: #2980b9;
+      color: white;
+      padding: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    video {
+      width: 100%;
+      height: auto;
+      background-color: black;
+    }
+
+    .card-description {
+      padding: 15px;
+      font-size: 14px;
+      color: #555;
+      border-top: 1px solid #eee;
+    }
+
+    @media (max-width: 600px) {
+      .card {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Available Videos</h1>
+  <div class="container" id="videoContainer">
+    <!-- Cards will be inserted here -->
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const container = document.getElementById("videoContainer");
+
+      fetch("http://localhost:8080/movie-info/list")
+        .then((res) => res.json())
+        .then((videos) => {
+          videos.forEach((video) => {
+            const card = document.createElement("div");
+            card.className = "card";
+
+            const title = document.createElement("div");
+            title.className = "card-title";
+            title.textContent = video.name;
+
+            const videoElement = document.createElement("video");
+            videoElement.setAttribute("controls", true);
+            videoElement.setAttribute("preload", "metadata");
+            // Set poster using #t=2 for thumbnail from 2 seconds
+            // videoElement.setAttribute("poster", `http://localhost:8080/stream/with-id/${video.id}#t=2`);
+            
+            const source = document.createElement("source");
+            source.setAttribute("src", `http://localhost:8080/stream/with-id/${video.id}`);
+            source.setAttribute("type", "video/mp4");
+
+            videoElement.appendChild(source);
+
+            const description = document.createElement("div");
+            description.className = "card-description";
+            description.textContent = video.description;
+
+            card.appendChild(title);
+            card.appendChild(videoElement);
+            card.appendChild(description);
+            container.appendChild(card);
+          });
+        })
+        .catch((error) => {
+          console.error("Failed to load videos:", error);
+          container.innerHTML = "<p>Could not load videos. Make sure the backend is running.</p>";
+        });
+    });
+  </script>
+</body>
+</html>
